@@ -64,7 +64,12 @@
     <Compile Include="ApprovalTest.cs" />
     <Compile Include="GildedRose.cs" />
     <Compile Include="GildedRoseTest.cs" />
-    <Compile Include="Item.cs" />
+    <Compile Include="Items\AgedBrie.cs" />
+    <Compile Include="Items\BackstagePass.cs" />
+    <Compile Include="Items\BasicItem.cs" />
+    <Compile Include="Items\ConjuredItem.cs" />
+    <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\Sulfuras.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -75,6 +80,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
