@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 
 namespace csharp
 {
@@ -14,75 +16,56 @@ namespace csharp
         {
             for (var i = 0; i < Items.Count; i++)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                if (!Items[i].Name.Contains("Sulfuras"))
                 {
-                    if (Items[i].Quality > 0)
+                    if (Items[i].Name.Contains("Backstage passes"))
                     {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
+                        if (Items[i].SellIn <= 0)
                         {
-                            Items[i].Quality = Items[i].Quality - 1;
+                            Items[i].Quality = 0;
+                        } 
+                        else if (Items[i].SellIn <= 5)
+                        {
+                            Items[i].Quality += 3;
                         }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
+                        else if (Items[i].SellIn <= 10)
                         {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                {
-                    Items[i].SellIn = Items[i].SellIn - 1;
-                }
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
+                            Items[i].Quality += 2;
                         }
                         else
                         {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
+                            Items[i].Quality++;
                         }
                     }
                     else
                     {
-                        if (Items[i].Quality < 50)
+                        int changeRate = 1;
+                        int qualityChange;
+
+                        if (Items[i].SellIn <= 0)
                         {
-                            Items[i].Quality = Items[i].Quality + 1;
+                            changeRate *= 2;
                         }
+
+                        if (Items[i].Name.Contains("Conjured"))
+                        {
+                            changeRate *= 2;
+                        }
+
+                        if (Items[i].Name == "Aged Brie")
+                        {
+                            qualityChange = changeRate;
+                        }
+                        else
+                        {
+                            qualityChange = -changeRate;
+                        }
+
+                        Items[i].Quality = Math.Max(0, Math.Min(50, Items[i].Quality + qualityChange));
                     }
                 }
+
+                Items[i].SellIn--;
             }
         }
     }
