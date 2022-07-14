@@ -42,5 +42,100 @@ namespace csharp
 
             Assert.AreEqual(0, items[0].Quality);
         }
+
+        [Test]
+        public void AgedBrieIncreasesInQuality()
+        {
+            IList<Item> items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 10, Quality = 5 } };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 5; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(10, items[0].Quality);
+        }
+
+        [Test]
+        public void AfterSellByDate_AgedBrieIncreasesTwiceInQuality()
+        {
+            IList<Item> items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 10, Quality = 5 } };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 15; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(25, items[0].Quality);
+        }
+
+        [Test]
+        public void ConjuredAgedBrieIncreasesTwiceInQuality()
+        {
+            IList<Item> items = new List<Item> { new Item { Name = "Conjured Aged Brie", SellIn = 10, Quality = 5 } };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 15; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(45, items[0].Quality);
+        }
+
+        [Test]
+        public void QualityIsPositiveAndLessThan50()
+        {
+            IList<Item> items = new List<Item>
+            {
+                new Item { Name = "Backstage passes to Electric Castle", SellIn = 21, Quality = 30 },
+                new Item { Name = "Elixir of Wrath", SellIn = 10, Quality = 20 }
+            };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 20; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(50, items[0].Quality);
+            Assert.AreEqual(0, items[1].Quality);
+        }
+
+        [Test]
+        public void AfterSellByDate_BackstagePassesQualityDropsToZero()
+        {
+            IList<Item> items = new List<Item>
+            {
+                new Item { Name = "Backstage passes to Electric Castle", SellIn = 10, Quality = 30 },
+            };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 11; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(0, items[0].Quality);
+        }
+
+        [Test]
+        public void SulfurasHaveFixedQuality()
+        {
+            IList<Item> items = new List<Item>
+            {
+                new Item { Name = "Sulfuras, Hand of Mono", SellIn = 200, Quality = 80 },
+            };
+            GildedRose app = new GildedRose(items);
+
+            for (int i = 1; i <= 300; ++i)
+            {
+                app.UpdateQuality();
+            }
+
+            Assert.AreEqual(80, items[0].Quality);
+        }
     }
 }
