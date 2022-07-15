@@ -1,141 +1,181 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using System.Dynamic;
+using csharp.Items;
 
 namespace csharp
 {
     [TestFixture]
     public class GildedRoseTest
     {
-        [Test]
-        public void foo()
+        private GildedRose app;
+        
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            IList<Item> Items = new List<Item> { new Item { Name = "foo", SellIn = 0, Quality = 0 } };
-            GildedRose app = new GildedRose(Items);
-            app.UpdateQuality();
-            Assert.AreEqual("foo", Items[0].Name);
+            app = new GildedRose();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            app.RemoveAllItems();
         }
 
         [Test]
-        public void AfterSellByDate_QualityDegradesTwiceAsFast()
+        public void foo()
         {
-            IList<Item> items = new List<Item> { new Item { Name = "Big Mac", SellIn = 5, Quality = 50 } };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new BasicItem { Name = "foo", SellIn = 0, Quality = 0 });
 
-            for (int i = 1; i <= 10; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // when
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(35, items[0].Quality);
+            // then
+            Assert.AreEqual("foo", app.GetItems()[0].Name);
+        }
+
+        [Test]
+        public void QualityDegradesTwiceAsFast_AfterSellByDate()
+        {
+            // given
+            app.AddItem(new BasicItem { Name = "Big Mac", SellIn = 0, Quality = 20 });
+
+            // when
+            app.UpdateItemsQuality();
+
+            // then
+            Assert.AreEqual(18, app.GetItems()[0].Quality);
         }
 
         [Test]
         public void ConjuredItemsDegradeTwiceAsFast()
         {
-            IList<Item> items = new List<Item> { new Item { Name = "Conjured Apple Pie", SellIn = 5, Quality = 10 } };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new ConjuredItem { Name = "Conjured Apple Pie", SellIn = 5, Quality = 10 });
 
-            for (int i = 1; i <= 5; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(0, items[0].Quality);
+            // then
+            Assert.AreEqual(8, app.GetItems()[0].Quality);
         }
 
         [Test]
         public void AgedBrieIncreasesInQuality()
         {
-            IList<Item> items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 10, Quality = 5 } };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new AgedBrie { Name = "Aged Brie", SellIn = 10, Quality = 5 });
 
-            for (int i = 1; i <= 5; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(10, items[0].Quality);
+            // then
+            Assert.AreEqual(6, app.GetItems()[0].Quality);
         }
 
         [Test]
-        public void AfterSellByDate_AgedBrieIncreasesTwiceInQuality()
+        public void AgedBrieIncreasesTwiceInQuality_AfterSellByDate()
         {
-            IList<Item> items = new List<Item> { new Item { Name = "Aged Brie", SellIn = 10, Quality = 5 } };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new AgedBrie { Name = "Aged Brie", SellIn = 0, Quality = 5 });
 
-            for (int i = 1; i <= 15; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(25, items[0].Quality);
+            // then
+            Assert.AreEqual(7, app.GetItems()[0].Quality);
         }
 
         [Test]
-        public void ConjuredAgedBrieIncreasesTwiceInQuality()
+        public void QualityIsNeverNegative()
         {
-            IList<Item> items = new List<Item> { new Item { Name = "Conjured Aged Brie", SellIn = 10, Quality = 5 } };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new BasicItem { Name = "Elixir of Wrath", SellIn = 10, Quality = 0 });
+            
+            // where
+            app.UpdateItemsQuality();
 
-            for (int i = 1; i <= 15; ++i)
-            {
-                app.UpdateQuality();
-            }
-
-            Assert.AreEqual(45, items[0].Quality);
+            // then
+            Assert.AreEqual(0, app.GetItems()[0].Quality);
         }
 
         [Test]
-        public void QualityIsPositiveAndLessThan50()
+        public void QualityIsAlwaysLessThan50()
         {
-            IList<Item> items = new List<Item>
-            {
-                new Item { Name = "Backstage passes to Electric Castle", SellIn = 21, Quality = 30 },
-                new Item { Name = "Elixir of Wrath", SellIn = 10, Quality = 20 }
-            };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new BackstagePass { Name = "Backstage passes to Electric Castle", SellIn = 4, Quality = 48 });
 
-            for (int i = 1; i <= 20; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(50, items[0].Quality);
-            Assert.AreEqual(0, items[1].Quality);
+            // then
+            Assert.AreEqual(50, app.GetItems()[0].Quality);
         }
 
         [Test]
-        public void AfterSellByDate_BackstagePassesQualityDropsToZero()
+        public void BackstagePassesQualityIncreasesBy1_WhenThereAreMoreThan10DaysLeft()
         {
-            IList<Item> items = new List<Item>
-            {
-                new Item { Name = "Backstage passes to Electric Castle", SellIn = 10, Quality = 30 },
-            };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new BackstagePass { Name = "Backstage passes to Electric Castle", SellIn = 20, Quality = 12 });
 
-            for (int i = 1; i <= 11; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(0, items[0].Quality);
+            // then
+            Assert.AreEqual(13, app.GetItems()[0].Quality);
+        }
+
+        [Test]
+        public void BackstagePassesQualityIncreasesBy2_WhenThereAre10DaysOrLessLeft()
+        {
+            // given
+            app.AddItem(new BackstagePass { Name = "Backstage passes to Electric Castle", SellIn = 7, Quality = 21 });
+
+            // where
+            app.UpdateItemsQuality();
+
+            // then
+            Assert.AreEqual(23, app.GetItems()[0].Quality);
+        }
+
+        [Test]
+        public void BackstagePassesQualityIncreasesBy3_WhenThereAre5DaysOrLessLeft()
+        {
+            // given
+            app.AddItem(new BackstagePass { Name = "Backstage passes to Electric Castle", SellIn = 4, Quality = 39 });
+
+            // where
+            app.UpdateItemsQuality();
+
+            // then
+            Assert.AreEqual(42, app.GetItems()[0].Quality);
+        }
+
+        [Test]
+        public void BackstagePassesQualityDropsToZero_AfterSellByDate()
+        {
+            // given
+            app.AddItem(new BackstagePass { Name = "Backstage passes to Electric Castle", SellIn = 0, Quality = 30 });
+
+            // where
+            app.UpdateItemsQuality();
+
+            // then
+            Assert.AreEqual(0, app.GetItems()[0].Quality);
         }
 
         [Test]
         public void SulfurasHaveFixedQuality()
         {
-            IList<Item> items = new List<Item>
-            {
-                new Item { Name = "Sulfuras, Hand of Mono", SellIn = 200, Quality = 80 },
-            };
-            GildedRose app = new GildedRose(items);
+            // given
+            app.AddItem(new Sulfuras { Name = "Sulfuras, Hand of Mono", SellIn = 200, Quality = 80 });
 
-            for (int i = 1; i <= 300; ++i)
-            {
-                app.UpdateQuality();
-            }
+            // where
+            app.UpdateItemsQuality();
 
-            Assert.AreEqual(80, items[0].Quality);
+            // then
+            Assert.AreEqual(80, app.GetItems()[0].Quality);
         }
     }
 }

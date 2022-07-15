@@ -7,66 +7,49 @@ namespace csharp
     public class GildedRose
     {
         IList<Item> items;
+
+        public GildedRose()
+        {
+            items = new List<Item>();
+        }
+
+        public IList<Item> GetItems()
+        {
+            return items;
+        }
+        
         public GildedRose(IList<Item> items)
         {
             this.items = items;
         }
 
-        public void UpdateQuality()
+        public void AddItem(Item item)
         {
-            for (var i = 0; i < items.Count; i++)
+            items.Add(item);
+        }
+
+        public void RemoveItem(string name)
+        {
+            for (int i = 0; i < items.Count; ++i)
             {
-                if (!items[i].Name.Contains("Sulfuras"))
+                if (items[i].Name == name)
                 {
-                    int qualityChange;
-                    
-                    if (items[i].Name.Contains("Backstage passes"))
-                    {
-                        if (items[i].SellIn <= 0)
-                        {
-                            qualityChange = -items[i].Quality;
-                        } 
-                        else if (items[i].SellIn <= 5)
-                        {
-                            qualityChange = 3;
-                        }
-                        else if (items[i].SellIn <= 10)
-                        {
-                            qualityChange = 2;
-                        }
-                        else
-                        {
-                            qualityChange = 1;
-                        }
-                    }
-                    else
-                    {
-                        int changeRate = 1;
-
-                        if (items[i].SellIn <= 0)
-                        {
-                            changeRate *= 2;
-                        }
-
-                        if (items[i].Name.Contains("Conjured"))
-                        {
-                            changeRate *= 2;
-                        }
-
-                        if (items[i].Name.Contains("Aged Brie"))
-                        {
-                            qualityChange = changeRate;
-                        }
-                        else
-                        {
-                            qualityChange = -changeRate;
-                        }
-                    }
-
-                    items[i].Quality = Math.Max(0, Math.Min(50, items[i].Quality + qualityChange));
+                    items.RemoveAt(i);
+                    return;
                 }
+            }
+        }
 
-                items[i].SellIn--;
+        public void RemoveAllItems()
+        {
+            items.Clear();
+        }
+
+        public void UpdateItemsQuality()
+        {
+            foreach (var item in items)
+            {
+                item.UpdateQuality();
             }
         }
     }

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace csharp.Items
 {
-    class Sulfuras
+    class Sulfuras : Item
     {
+        public override void UpdateQuality()
+        {
+            Quality = 80;
+        }
     }
 }

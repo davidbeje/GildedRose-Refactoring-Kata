@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace csharp.Items
 {
-    class BasicItem
+    class BasicItem : Item
     {
+        public override void UpdateQuality()
+        {
+            if (SellIn <= 0)
+            {
+                Quality = Math.Max(0, Quality - 2);
+            }
+            else
+            {
+                Quality = Math.Max(0, Quality - 1);
+            }
+        }
     }
 }
